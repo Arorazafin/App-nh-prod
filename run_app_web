@@ -1,0 +1,4 @@
+#!/usr/bin/env bash
+
+echo chargement ...
+docker exec -i app_web bash -c "python ./02.appli-web/index.py"

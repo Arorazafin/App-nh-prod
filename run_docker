@@ -1,0 +1,16 @@
+#!/usr/bin/env bash
+
+##exit immediately if one command exist with non-zero status
+set -e
+##load .env to environement variable
+#set -a
+#source .env
+#set +a
+
+cd 00.docker
+
+## Remove containers if already running
+docker-compose rm -fsv database_web adminer app_web app_db
+## Build and spin (stop if error in building) and run containers in background
+docker-compose up --build --remove-orphans -d
+

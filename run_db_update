@@ -1,0 +1,75 @@
+#!/usr/bin/env bash
+
+##load .env to environement variable
+set -a
+source .env
+set +a
+
+if [ -z "$1" ]
+then
+    echo "l'argument 'date d'extraction' est vide (YYYY-MM-DD)"
+    return
+fi
+
+export DATE=$1
+
+declare agences
+agences=(
+   [100]="ACTIII" 
+   [101]="ACT02" 
+   [102]="ACTII" 
+   [103]="TOAMASINA" 
+   [104]="DCS" 
+   [105]="INDEPENDANCE" 
+   [106]="ANTSIRABE" 
+   [107]="FIANARANTSOA" 
+   [108]="MAHAJANGA" 
+   [109]="SAMBAVA" 
+   [110]="ATSIRANANA" 
+   [111]="CAP3000" 
+   [112]="MORONDAVA" 
+   [113]="MORAMANGA" 
+   [114]="MINORIS" 
+   [115]="TOLIARA" 
+   [116]="AMBATOLAMPIKELY" 
+   [117]="AMBOSITRA" 
+   [118]="ANALAVORY" 
+   [119]="SIEGE_PRODUCTION" 
+   [120]="TOLAGNARO" 
+   [121]="AMBATONDRAZAKA" 
+   [122]="NOSYBE" 
+   [123]="ANTALAHA" 
+   [124]="ITAOSY" 
+   [125]="ANTSOHIHY" 
+   [126]="MANAKARA" 
+   [200]="RAR" 
+   [201]="CAR" 
+   [207]="SAMASS" 
+   [209]="AFINE" 
+   [212]="AVENIR" 
+)
+
+echo "date d'extraction: ${DATE}"
+
+for i in "${!agences[@]}"
+do
+   echo "key  : $i"
+   echo "value: ${agences[$i]}"
+   docker exec -i app_db bash -c "python 01.database/nh-db.py nh -f $i.xlsx -d ${DATE} -t ${agences[$i]}"
+   echo " "
+   
+done
+
+echo Voulez-vous sauvegarder la base de donnée mise à jour - o/N ?
+read save
+
+echo votre réponse: $save
+
+if [ "$save" = "o" ]
+then
+   echo sauvegarde en cours ...
+   docker exec -i db_postgres bash -c "pg_dump dbNH -U postgres > docker-entrypoint-initdb.d/dbNH.sql"
+   echo "dbNH enregistré pour la date d'extraction ${DATE}"
+else
+    echo 'dbNH NON enregitré'
+fi
