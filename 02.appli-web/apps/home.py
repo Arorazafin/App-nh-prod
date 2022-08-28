@@ -88,7 +88,7 @@ layout = dbc.Container([
 
 
             dbc.Row([
-                dbc.Col(html.A(children='Copyright 2022 CAR')
+                dbc.Col(html.A(children='Copyright 2022 - NY HAVANA')
                         , className="mb-5 text-center")
             ]),
     

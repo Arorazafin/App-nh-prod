@@ -14,3 +14,6 @@ docker-compose rm -fsv database_web adminer app_web app_db
 ## Build and spin (stop if error in building) and run containers in background
 docker-compose up --build --remove-orphans -d
 
+echo docker is running
+cd ..
+
