@@ -1,0 +1,9 @@
+#!/usr/bin/env bash
+
+##exit immediately if one command exist with non-zero status
+set -e
+
+cd 00.docker
+docker-compose down
+cd ..
+
