@@ -121,6 +121,8 @@ for k,v in nh_agences_init.items():
 #Close the database connection
 dbConnection.close()
 
+for k,v in nh_agences.items():
+    print(str(k) + " - " + v[2]['Date effet quittance'].min().strftime("%d %b %Y"))
 
 
 #print(nh_agences)
@@ -178,13 +180,20 @@ print('-Table created on {:02d}mn{:02d}sec'.format(int(minutes),int(secondes)))
 
 #les elements du reseau
 dateExtractionReseau = instAgences.collectionAgences[next(iter(instAgences.collectionAgences))].dateExtraction
+year_n = dateExtractionReseau.year
+year_n_1 = dateExtractionReseau.year - 1
+
+
+dateExtractionReseau = dateExtractionReseau.strftime("%d %b %Y")
+
+
 print()
 print("nb agences: "+ str(len(instAgences.collectionAgences)))
 print("Date d'extraction: ")
 print(dateExtractionReseau)
 print()
 
-
+#print(instAgences.vueQuittancesEvolAnnuel[101])
 
 def func_instAgence(codeAgence):
 
@@ -269,8 +278,8 @@ def graph_evolQuittance_prime(instQ):
 
     df_graph = instQ.evolAnnuel
 
-    df_graph = df_graph[df_graph.index>2019]
-    df_graph = df_graph[df_graph.index<2023]
+    #df_graph = df_graph[df_graph.index>2019]
+    #df_graph = df_graph[df_graph.index<2023]
 
     fig = go.Figure()
 
@@ -294,8 +303,8 @@ def graph_evolQuittance_prime(instQ):
             ticks="outside",
             tickson="boundaries",
             ticklen=20,
-            ticktext=["2020", "2021", "2022 YTD"],
-            tickvals=[2020, 2021, 2022],
+            #ticktext=["2020", "2021", "2022 YTD"],
+            #tickvals=[2020, 2021, 2022],
         )
     fig.update_layout(
         legend=dict(
@@ -315,8 +324,8 @@ def graph_evolQuittance_prime(instQ):
 def graph_evolQuittance_solde_agences(instAgences,reseau):
 
     df_graph = instAgences.vueQuittancesEvolAnnuel[reseau]
-    df_graph = df_graph[df_graph.index>2019]
-    df_graph = df_graph[df_graph.index<2023]
+    #df_graph = df_graph[df_graph.index>2019]
+    #df_graph = df_graph[df_graph.index<2023]
 
     fig = go.Figure()
     fig.add_trace(
@@ -331,8 +340,8 @@ def graph_evolQuittance_solde_agences(instAgences,reseau):
             ticks="outside",
             tickson="boundaries",
             ticklen=20,
-            ticktext=["2020", "2021", "2022 YTD"],
-            tickvals=[2020, 2021, 2022],
+            #ticktext=["2020", "2021", "2022 YTD"],
+            #tickvals=[2020, 2021, 2022],
         )
 
     dcc_graph = dcc.Graph(figure = fig)
@@ -342,8 +351,8 @@ def graph_evolQuittance_solde_agences(instAgences,reseau):
 def graph_evolQuittance_solde(instQ):
 
     df_graph = instQ.evolAnnuel
-    df_graph = df_graph[df_graph.index>2019]
-    df_graph = df_graph[df_graph.index<2023]
+    #df_graph = df_graph[df_graph.index>2019]
+    #df_graph = df_graph[df_graph.index<2023]
 
     fig = go.Figure()
     fig.add_trace(
@@ -358,8 +367,8 @@ def graph_evolQuittance_solde(instQ):
             ticks="outside",
             tickson="boundaries",
             ticklen=20,
-            ticktext=["2020", "2021", "2022 YTD"],
-            tickvals=[2020, 2021, 2022],
+            #ticktext=["2020", "2021", "2022 YTD"],
+            #tickvals=[2020, 2021, 2022],
         )
 
     dcc_graph = dcc.Graph(figure = fig)
@@ -371,8 +380,8 @@ def graph_EvolQuittance_prime_agences(instAgences,reseau):
 
     df_graph = instAgences.vueQuittancesEvolAnnuel[reseau]
 
-    df_graph = df_graph[df_graph.index>2019]
-    df_graph = df_graph[df_graph.index<2023]
+    #df_graph = df_graph[df_graph.index>2019]
+    #df_graph = df_graph[df_graph.index<2023]
 
     fig = go.Figure()
 
@@ -396,8 +405,8 @@ def graph_EvolQuittance_prime_agences(instAgences,reseau):
             ticks="outside",
             tickson="boundaries",
             ticklen=20,
-            ticktext=["2020", "2021", "2022 YTD"],
-            tickvals=[2020, 2021, 2022],
+            #ticktext=["2020", "2021", "2022 YTD"],
+            #tickvals=[2020, 2021, 2022],
         )
     fig.update_layout(
         legend=dict(
@@ -917,17 +926,17 @@ def render_tab_content(active_tab,v1,v2):
                     html.Br(),
                     dbc.Row(
                         [
-                            dbc.Col([dbc.Card(card_content("Primes 2021",instAgencesQuittances.vueQuittancesEvolAnnuel2(reseau,2021,'prime'),"nb"),
+                            dbc.Col([dbc.Card(card_content("Primes " + str(year_n_1),instAgencesQuittances.vueQuittancesEvolAnnuel2(reseau,year_n_1,'prime'),"nb"),
                                 style={'text-align': 'center'}, color="danger", outline=True,
                                 id="cardQ21")
                             ],xs=12, sm=12, md=12, lg=4, xl=4),
 
-                            dbc.Col([dbc.Card(card_content("Solde 2021",instAgencesQuittances.vueQuittancesEvolAnnuel2(reseau,2021,'solde'),"nb"),
+                            dbc.Col([dbc.Card(card_content("Solde " + str(year_n_1),instAgencesQuittances.vueQuittancesEvolAnnuel2(reseau,year_n_1,'solde'),"nb"),
                                 style={'text-align': 'center'}, color="danger", outline=True,
                                 id="cardQ22")
                             ],xs=12, sm=12, md=12, lg=4, xl=4),
 
-                            dbc.Col([dbc.Card(card_content("Taux de paiement 2021",instAgencesQuittances.vueQuittancesEvolAnnuel2(reseau,2021,'tx_paiement'),"%"),
+                            dbc.Col([dbc.Card(card_content("Taux de paiement "+ str(year_n_1),instAgencesQuittances.vueQuittancesEvolAnnuel2(reseau,year_n_1,'tx_paiement'),"%"),
                                 style={'text-align': 'center'}, color="danger", outline=True,
                                 id="cardQ23")
                             ],xs=12, sm=12, md=12, lg=4, xl=4),
@@ -937,17 +946,17 @@ def render_tab_content(active_tab,v1,v2):
                     html.Br(),
                     dbc.Row(
                         [
-                            dbc.Col([dbc.Card(card_content("Primes 2022 (YTD)",instAgencesQuittances.vueQuittancesEvolAnnuel2(reseau,2022,'prime'),"nb"),
+                            dbc.Col([dbc.Card(card_content("Primes "+ str(year_n) +" (YTD)",instAgencesQuittances.vueQuittancesEvolAnnuel2(reseau,year_n,'prime'),"nb"),
                                 style={'text-align': 'center'}, color="danger", outline=True,
                                 id="cardQ31")
                             ],xs=12, sm=12, md=12, lg=4, xl=4),
 
-                            dbc.Col([dbc.Card(card_content("Solde 2022 (YTD)",instAgencesQuittances.vueQuittancesEvolAnnuel2(reseau,2022,'solde'),"nb"),
+                            dbc.Col([dbc.Card(card_content("Solde "+ str(year_n) +" (YTD)",instAgencesQuittances.vueQuittancesEvolAnnuel2(reseau,year_n,'solde'),"nb"),
                                 style={'text-align': 'center'}, color="danger", outline=True,
                                 id="cardQ32")
                             ],xs=12, sm=12, md=12, lg=4, xl=4),
 
-                            dbc.Col([dbc.Card(card_content("Taux de paiement 2022 (YTD)",instAgencesQuittances.vueQuittancesEvolAnnuel2(reseau,2022,'tx_paiement'),"%"),
+                            dbc.Col([dbc.Card(card_content("Taux de paiement "+ str(year_n) +" (YTD)",instAgencesQuittances.vueQuittancesEvolAnnuel2(reseau,year_n,'tx_paiement'),"%"),
                                 style={'text-align': 'center'}, color="danger", outline=True,
                                 id="cardQ33")
                             ],xs=12, sm=12, md=12, lg=4, xl=4),
@@ -996,17 +1005,17 @@ def render_tab_content(active_tab,v1,v2):
                     html.Br(),
                     dbc.Row(
                         [
-                            dbc.Col([dbc.Card(card_content("Primes 2021",instQuittances.evolAnnuel2(2021,'prime'),"nb"),
+                            dbc.Col([dbc.Card(card_content("Primes "+ str(year_n_1),instQuittances.evolAnnuel2(year_n_1,'prime'),"nb"),
                                 style={'text-align': 'center'}, color="danger", outline=True,
                                 id="cardQ21")
                             ],xs=12, sm=12, md=12, lg=4, xl=4),
 
-                            dbc.Col([dbc.Card(card_content("Solde 2021",instQuittances.evolAnnuel2(2021,'solde'),"nb"),
+                            dbc.Col([dbc.Card(card_content("Solde "+ str(year_n_1),instQuittances.evolAnnuel2(year_n_1,'solde'),"nb"),
                                 style={'text-align': 'center'}, color="danger", outline=True,
                                 id="cardQ22")
                             ],xs=12, sm=12, md=12, lg=4, xl=4),
 
-                            dbc.Col([dbc.Card(card_content("Taux de paiement 2021",instQuittances.evolAnnuel2(2021,'tx_paiement'),"%"),
+                            dbc.Col([dbc.Card(card_content("Taux de paiement "+ str(year_n_1),instQuittances.evolAnnuel2(year_n_1,'tx_paiement'),"%"),
                                 style={'text-align': 'center'}, color="danger", outline=True,
                                 id="cardQ23")
                             ],xs=12, sm=12, md=12, lg=4, xl=4),
@@ -1016,17 +1025,17 @@ def render_tab_content(active_tab,v1,v2):
                     html.Br(),
                     dbc.Row(
                         [
-                            dbc.Col([dbc.Card(card_content("Primes 2022 (YTD)",instQuittances.evolAnnuel2(2022,'prime'),"nb"),
+                            dbc.Col([dbc.Card(card_content("Primes "+ str(year_n) +" (YTD)",instQuittances.evolAnnuel2(year_n,'prime'),"nb"),
                                 style={'text-align': 'center'}, color="danger", outline=True,
                                 id="cardQ31")
                             ],xs=12, sm=12, md=12, lg=4, xl=4),
 
-                            dbc.Col([dbc.Card(card_content("Solde 2022 (YTD)",instQuittances.evolAnnuel2(2022,'solde'),"nb"),
+                            dbc.Col([dbc.Card(card_content("Solde "+ str(year_n) +" (YTD)",instQuittances.evolAnnuel2(year_n,'solde'),"nb"),
                                 style={'text-align': 'center'}, color="danger", outline=True,
                                 id="cardQ32")
                             ],xs=12, sm=12, md=12, lg=4, xl=4),
 
-                            dbc.Col([dbc.Card(card_content("Taux de paiement 2022 (YTD)",instQuittances.evolAnnuel2(2022,'tx_paiement'),"%"),
+                            dbc.Col([dbc.Card(card_content("Taux de paiement "+ str(year_n) +" (YTD)",instQuittances.evolAnnuel2(year_n,'tx_paiement'),"%"),
                                 style={'text-align': 'center'}, color="danger", outline=True,
                                 id="cardQ33")
                             ],xs=12, sm=12, md=12, lg=4, xl=4),

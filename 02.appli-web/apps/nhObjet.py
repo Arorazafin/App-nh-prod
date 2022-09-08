@@ -212,8 +212,12 @@ class Agences:
         self.vueClientsClientPlusGrosDeficit = dict()
 
     def vueQuittancesEvolAnnuel2(self,reseau,idx,critere):
-        # idex = annee, mois ; criere = prime, solde 
-        res = self.vueQuittancesEvolAnnuel[reseau].loc[idx,critere] 
+        # idx = annee, mois ; criere = prime, solde 
+        res = 0
+        if idx in self.vueQuittancesEvolAnnuel[reseau].index:
+            res = self.vueQuittancesEvolAnnuel[reseau].loc[idx,critere]
+        else:
+            res = 0 
         return res
         
     def initCollection(self):
@@ -1012,7 +1016,12 @@ class Quittances:
     
     def evolAnnuel2(self,idx,critere):
         # idex = annee, mois ; criere = prime, solde
-        res = self.evolAnnuel.loc[idx,critere] 
+        res = 0
+        if idx in self.evolAnnuel.index:
+            res = self.evolAnnuel.loc[idx,critere]
+        else:
+            res = 0 
+        #res = self.evolAnnuel.loc[idx,critere] 
         return res
 
 class Assurances:
