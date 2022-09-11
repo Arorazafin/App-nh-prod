@@ -1,4 +1,5 @@
 # standard package
+from datetime import datetime
 import pandas as pd
 import numpy as np
 
@@ -64,5 +65,20 @@ def func_reguler(df_checking, agences):
 def change_type(agences):
 #cols chmt de type "Prime totale quittance"  -> float
     for k,v in agences.items():
-        v[2] = v[2].astype({"Prime totale quittance": float , "Code souscripteur": int ,"Montant Encaissé quittance": float})
+        print(k)
+        v[2] = v[2].astype({"Prime totale quittance": float })
+        v[2]["Prime totale quittance"] = v[2]["Prime totale quittance"].fillna(0)
+        print("Prime totale quittance OK")
+        v[2] = v[2].astype({"Code souscripteur": int })
+        print("Code souscripteur OK")
+        #rempalcer les na par 0
+        try:
+            v[2] = v[2].astype({"Montant Encaissé quittance": float})
+        except:
+            err = v[2][v[2]["Montant Encaissé quittance"]==np.datetime64("NaT")]
+            print(err) 
+            v[2]["Montant Encaissé quittance"] =  v[2]["Montant Encaissé quittance"].fillna(np.nan).replace([np.nan], [0])
+        v[2] = v[2].astype({"Montant Encaissé quittance": float})
+        v[2]["Montant Encaissé quittance"] = v[2]["Montant Encaissé quittance"].fillna(0)
+        print("Montant Encaissé quittance OK")
     return agences

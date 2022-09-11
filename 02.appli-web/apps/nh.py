@@ -21,6 +21,8 @@ import numpy as np
 #
 import re
 import os
+import sys
+import copy
 
 # env mngt
 from dotenv import load_dotenv
@@ -45,50 +47,53 @@ from app import app
 # les objets
 from apps import nhObjet, nhData
 
-
+print()
 today = datetime.date.today()
-print("Today's date on acnh page: ", today)
-
+print("Today's date on nh page: ", today)
+print()
 
 #les agences
+#selection au moins 1 ac et 1 ag pour que l'appli fonctionne
 nh_agences_init = {
-    100:['ACTIII','100-ACTIII',pd.DataFrame()],
-    101:['ACT02','101-ACT02',pd.DataFrame()],
-    102:['ACTII','102-ACTII',pd.DataFrame()],
-    103:['TOAMASINA','103-TOAMASINA',pd.DataFrame()],
-    104:['DCS','104-DCS',pd.DataFrame()],
-    105:['INDEPENDANCE','105-INDEPENDANCE',pd.DataFrame()],
-    106:['ANTSIRABE','106-ANTSIRABE',pd.DataFrame()],
-    107:['FIANARANTSOA','107-FIANARANTSOA',pd.DataFrame()],
-    108:['MAHAJANGA','108-MAHAJANGA',pd.DataFrame()],
-    109:['SAMBAVA','109-SAMBAVA',pd.DataFrame()],
-    110:['ATSIRANANA','110-ATSIRANANA',pd.DataFrame()],
-    111:['CAP3000','111-CAP3000',pd.DataFrame()],
-    112:['MORONDAVA','112-MORONDAVA',pd.DataFrame()],
-    113:['MORAMANGA','113-MORAMANGA',pd.DataFrame()],
-    114:['MINORIS','114-MINORIS',pd.DataFrame()],
-    115:['TOLIARA','115-TOLIARA',pd.DataFrame()],
-    116:['AMBATOLAMPIKELY','116-AMBATOLAMPIKELY',pd.DataFrame()],
-    117:['AMBOSITRA','117-AMBOSITRA',pd.DataFrame()],
-    118:['ANALAVORY','118-ANALAVORY',pd.DataFrame()],
-    119:['SIEGE_PRODUCTION','119-SIEGE_PRODUCTION',pd.DataFrame()],
-    120:['TOLAGNARO','120-TOLAGNARO',pd.DataFrame()],
-    121:['AMBATONDRAZAKA','121-AMBATONDRAZAKA',pd.DataFrame()],
-    122:['NOSYBE','122-NOSYBE',pd.DataFrame()],
-    123:['ANTALAHA','123-ANTALAHA',pd.DataFrame()],
-    124:['ITAOSY','124-ITAOSY',pd.DataFrame()],
-    125:['ANTSOHIHY','125-ANTSOHIHY',pd.DataFrame()],
-    126:['MANAKARA','126-MANAKARA',pd.DataFrame()],
-    200:['RAR','200-RAR',pd.DataFrame()],
-    201:['CAR','201-CAR',pd.DataFrame()],
-    207:['SAMASS','207-SAMASS',pd.DataFrame()],
-    209:['AFINE','209-AFINE',pd.DataFrame()],
-    212:['AVENIR','212-AVENIR',pd.DataFrame()],
+    
+        100:['ACTIII','100-ACTIII',pd.DataFrame()],
+        101:['ACT02','101-ACT02',pd.DataFrame()],
+        102:['ACTII','102-ACTII',pd.DataFrame()],
+        103:['TOAMASINA','103-TOAMASINA',pd.DataFrame()],
+        104:['DCS','104-DCS',pd.DataFrame()],
+        105:['INDEPENDANCE','105-INDEPENDANCE',pd.DataFrame()],
+        106:['ANTSIRABE','106-ANTSIRABE',pd.DataFrame()],
+        107:['FIANARANTSOA','107-FIANARANTSOA',pd.DataFrame()],
+        108:['MAHAJANGA','108-MAHAJANGA',pd.DataFrame()],
+        109:['SAMBAVA','109-SAMBAVA',pd.DataFrame()],
+        110:['ATSIRANANA','110-ATSIRANANA',pd.DataFrame()],
+        111:['CAP3000','111-CAP3000',pd.DataFrame()],
+        112:['MORONDAVA','112-MORONDAVA',pd.DataFrame()],
+        113:['MORAMANGA','113-MORAMANGA',pd.DataFrame()],
+        114:['MINORIS','114-MINORIS',pd.DataFrame()],
+        115:['TOLIARA','115-TOLIARA',pd.DataFrame()],
+        116:['AMBATOLAMPIKELY','116-AMBATOLAMPIKELY',pd.DataFrame()],
+        117:['AMBOSITRA','117-AMBOSITRA',pd.DataFrame()],
+        118:['ANALAVORY','118-ANALAVORY',pd.DataFrame()],
+        119:['SIEGE_PRODUCTION','119-SIEGE_PRODUCTION',pd.DataFrame()],
+        120:['TOLAGNARO','120-TOLAGNARO',pd.DataFrame()],
+        121:['AMBATONDRAZAKA','121-AMBATONDRAZAKA',pd.DataFrame()],
+        122:['NOSYBE','122-NOSYBE',pd.DataFrame()],
+        123:['ANTALAHA','123-ANTALAHA',pd.DataFrame()],
+        124:['ITAOSY','124-ITAOSY',pd.DataFrame()],
+        125:['ANTSOHIHY','125-ANTSOHIHY',pd.DataFrame()],
+        126:['MANAKARA','126-MANAKARA',pd.DataFrame()],
+        
+        200:['RAR','200-RAR',pd.DataFrame()],
+        201:['CAR','201-CAR',pd.DataFrame()],
+        207:['SAMASS','207-SAMASS',pd.DataFrame()],
+        209:['AFINE','209-AFINE',pd.DataFrame()],
+        212:['AVENIR','212-AVENIR',pd.DataFrame()],
 
 }
 
-nh_agences = nh_agences_init.copy()
-
+#nh_agences = nh_agences_init.copy()
+nh_agences = copy.deepcopy(nh_agences_init)
 
 #get env db
 host=os.environ.get('HOST')
@@ -107,34 +112,56 @@ alchemyEngine = create_engine(db_url)
 dbConnection = alchemyEngine.connect()
 
 # Read data from PostgreSQL database table and load into a DataFrame instance
-
+reseauNbLine = 0
 for k,v in nh_agences_init.items():
     try:
         requete = 'SELECT * FROM "'+v[0]+'"'
-        v[2]  = pd.read_sql(requete, dbConnection)
+        nh_agences[k][2]  = pd.read_sql(requete, dbConnection).copy()
+        #affiche le shape des df recupérer
+        #print(str(k) + " - " + str(nh_agences[k][2].shape))
     except:
-        v[2]=pd.DataFrame()
-    if v[2].empty:
-        print(v[1] +  " est vide")
+        nh_agences[k][2]=pd.DataFrame()
+    if nh_agences[k][2].empty:
+        print(nh_agences[k][1] +  " est vide")
         del nh_agences[k]
-
+    reseauNbLine = reseauNbLine + len(nh_agences[k][2])
 #Close the database connection
 dbConnection.close()
 
+
+print("nb total de lignes: " + str(reseauNbLine))
+print()
+#check Date effet quittance'
+print("les dates extraites : ")
 for k,v in nh_agences.items():
-    print(str(k) + " - " + v[2]['Date effet quittance'].min().strftime("%d %b %Y"))
+   print(str(k) + " - " + v[2]['Date effet quittance'].min().strftime("%d %b %Y") + " >> " + v[2]['Date effet quittance'].max().strftime("%d %b %Y"))
+print()
 
+#Check size
+#print(sys.getsizeof(nh_agences))
+#print(sys.getsizeof(nh_agences_init))
 
-#print(nh_agences)
-#exit()
+##create 3 dataframes
+# nh_agences2022 =copy.deepcopy(nh_agences)
+# yr = 2022
+# for k,v in nh_agences.items():
+#     dfy=nh_agences2022[k][2].copy() 
+#     dfy["yr"] = [y.year for y in dfy['Date effet quittance']]
+#     nh_agences2022[k][2] = dfy[dfy["yr"]==yr].copy()
+#     nh_agences2022[k][2].drop("yr", axis = 1, inplace = True)
+#     if nh_agences2022[k][2].empty:
+#         print(nh_agences2022[k][1] +  " est vide")
+#         del nh_agences2022[k]
+
+# nh_agences = copy.deepcopy(nh_agences2022)
+
 
 #les constantes
 lsIndicateur = ['prime','solde','tx_paiement','ranking']
 lsAgencesDropDown = {0:['Toutes Agences','Toutes Agences',None]}
 lsAgencesDropDown.update(nh_agences)
 
-print("welcome acnh page")
-
+#print("welcome acnh page")
 #for k,v in nh_agences.items():
 #        print(k)
 #        print(v[2])
@@ -142,9 +169,9 @@ print("welcome acnh page")
 
 
 
-import sys
-print("mem acnh page: ", sys.getsizeof(nh_agences))
-print()
+
+#print("mem acnh page: ", sys.getsizeof(nh_agences))
+#print()
 
 
 
@@ -152,16 +179,22 @@ print()
 
 checking =  nhData.func_checking(nh_agences)
 print('data erreur: '+ str(checking ['erreur']))
-
+print()
 nh_agences = nhData.func_reguler(checking['df'],nh_agences)
 
 checking =  nhData.func_checking(nh_agences)
 print('data erreur après correction: '+ str(checking ['erreur']))
+print()
 
 nh_agences = nhData.change_type(nh_agences)
 print('changement types: OK')
+print()
 
-
+#check the shape for each df'
+print("les dimenssions des df: ")
+for k,v in nh_agences.items():
+    print(str(k) + " - " +str(v[2].shape))
+print()
 
 
 # Les objets et les collections
@@ -170,6 +203,7 @@ print('changement types: OK')
 
 t_start = time.perf_counter()
 print("Début chargement .... ")
+print()
 #print(t_start)
 instAgences = nhObjet.Agences(nh_agences)
 instAgences.initCollection()
@@ -177,7 +211,7 @@ t_end = time.perf_counter()
 deltaT= t_end - t_start
 minutes, secondes = divmod(deltaT, 60)
 print('-Table created on {:02d}mn{:02d}sec'.format(int(minutes),int(secondes)))
-
+print()
 #les elements du reseau
 dateExtractionReseau = instAgences.collectionAgences[next(iter(instAgences.collectionAgences))].dateExtraction
 year_n = dateExtractionReseau.year
@@ -191,6 +225,7 @@ print()
 print("nb agences: "+ str(len(instAgences.collectionAgences)))
 print("Date d'extraction: ")
 print(dateExtractionReseau)
+print("nb de lignes: " + str(reseauNbLine))
 print()
 
 #print(instAgences.vueQuittancesEvolAnnuel[101])

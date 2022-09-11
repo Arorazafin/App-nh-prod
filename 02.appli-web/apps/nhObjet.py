@@ -48,7 +48,10 @@ class Quittance:
         self.dateEffetQuittance = dateEffetQuittance
         self.dateEcheanceQuittance=dateEcheanceQuittance
         self.annee = dateEffetQuittance.year
-        self.mois = datetime.datetime.strptime(str(dateEffetQuittance.year)+"."+str(dateEffetQuittance.month)+".1", "%Y.%m.%d")
+        try :
+            self.mois = datetime.datetime.strptime(str(dateEffetQuittance.year)+"."+str(dateEffetQuittance.month)+".1", "%Y.%m.%d")
+        except:
+            self.mois = datetime.datetime(1900, 1, 1)    
         #self.mois = str(dateEffetQuittance.year)+"."+str(dateEffetQuittance.month)
         self.assurances = assurances
         self.typeMouvement = typeMouvement

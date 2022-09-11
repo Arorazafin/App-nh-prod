@@ -55,7 +55,6 @@ services:
             - POSTGRES_DB=dbNH
         volumes:  # Ensure the duplicability of the database on the host folder (especially when dump)
             - ../01.database/data-sql/dbNH.sql:/docker-entrypoint-initdb.d/dbNH.sql
-
         networks:
             - app_network
 
