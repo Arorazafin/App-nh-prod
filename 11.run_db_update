@@ -51,14 +51,16 @@ agences=(
 
 echo "date d'extraction: ${DATE}"
 
-for i in "${!agences[@]}"
-do
-   echo "key  : $i"
-   echo "value: ${agences[$i]}"
-   docker exec -i app_db bash -c "python 01.database/nh-db.py nh -f $i.xlsx -d ${DATE} -t ${agences[$i]}"
-   echo " "
+# for i in "${!agences[@]}"
+# do
+#    echo "key  : $i"
+#    echo "value: ${agences[$i]}"
+#    docker exec -i app_db bash -c "python 01.database/nh-db.py nh -f $i.xlsx -d ${DATE} -t ${agences[$i]}"
+#    echo " "
    
-done
+# done
+
+docker exec -i app_db bash -c "python 01.database/nh-db.py nhcsv -f nh-all.csv -d ${DATE}"
 
 echo Voulez-vous sauvegarder la base de donnée mise à jour - o/N ?
 read save

@@ -1,6 +1,7 @@
 
 
 import pandas as pd
+pd.options.mode.chained_assignment = None  # default='warn'
 import numpy as np
 import math
 
@@ -108,6 +109,68 @@ class dbNH(object):
 
         idOrass = 'Num quittance'
 
+        self.nh_agences_init = {
+    
+                100:['ACTIII','100-ACTIII','Agence Centrale'],
+                101:['ACT02','101-ACT02','Agence Centrale'],
+                102:['ACTII','102-ACTII','Agence Centrale'],
+                103:['TOAMASINA','103-TOAMASINA','Agence Centrale'],
+                104:['DCS','104-DCS','Agence Centrale'],
+                105:['INDEPENDANCE','105-INDEPENDANCE','Agence Centrale'],
+                106:['ANTSIRABE','106-ANTSIRABE','Agence Centrale'],
+                107:['FIANARANTSOA','107-FIANARANTSOA','Agence Centrale'],
+                108:['MAHAJANGA','108-MAHAJANGA','Agence Centrale'],
+                109:['SAMBAVA','109-SAMBAVA','Agence Centrale'],
+                110:['ATSIRANANA','110-ATSIRANANA','Agence Centrale'],
+                111:['CAP3000','111-CAP3000','Agence Centrale'],
+                112:['MORONDAVA','112-MORONDAVA','Agence Centrale'],
+                113:['MORAMANGA','113-MORAMANGA','Agence Centrale'],
+                114:['MINORIS','114-MINORIS','Agence Centrale'],
+                115:['TOLIARA','115-TOLIARA','Agence Centrale'],
+                116:['AMBATOLAMPIKELY','116-AMBATOLAMPIKELY','Agence Centrale'],
+                117:['AMBOSITRA','117-AMBOSITRA','Agence Centrale'],
+                118:['ANALAVORY','118-ANALAVORY','Agence Centrale'],
+                119:['SIEGE_PRODUCTION','119-SIEGE_PRODUCTION','Agence Centrale'],
+                120:['TOLAGNARO','120-TOLAGNARO','Agence Centrale'],
+                121:['AMBATONDRAZAKA','121-AMBATONDRAZAKA','Agence Centrale'],
+                122:['NOSYBE','122-NOSYBE','Agence Centrale'],
+                123:['ANTALAHA','123-ANTALAHA','Agence Centrale'],
+                124:['ITAOSY','124-ITAOSY','Agence Centrale'],
+                125:['ANTSOHIHY','125-ANTSOHIHY','Agence Centrale'],
+                126:['MANAKARA','126-MANAKARA','Agence Centrale'],
+
+                200:['RAR','200-RAR','Agent Général'],
+                201:['CAR','201-CAR','Agent Général'],
+                207:['SAMASS','207-SAMASS','Agent Général'],
+                209:['AFINE','209-AFINE','Agent Général'],
+                212:['AVENIR','212-AVENIR','Agent Général'],
+
+        }
+
+        self.colsCsv = ['Type mouvement',
+            'Libellé branche',
+            'Code catégorie',
+            'Libellé catégorie',
+            'Num quittance',
+            'Date effet quittance',
+            'Date échéance quittance',
+            'intermédiaire',
+            'Code intermédiaire',
+            'Num police',
+            'Num avenant',
+            'Date effet police',
+            'Date échéance police',
+            'Code souscripteur',
+            'souscripteur',
+            'Adresse Ass',
+            'Tel Ass',
+            'Mail Ass',
+            'Etat Quittance',
+            'Prime totale quittance',
+            'Date Encaiss quittance',
+            'Montant Encaissé quittance',
+        ]
+
         self.tables = dict()
         self.tables = { 'souscripteur' : [colsSouscripteur,idSouscripteur],
                         'police': [colsPolice, idPolice],
@@ -161,12 +224,6 @@ class dbNH(object):
         #    dic = json.load(f)
         #self.df = pd.DataFrame(dic)
 
-    def import_csv(self, files):
-        '''
-        import csv file
-        '''
-        self.df = pd.read_csv(files, sep=',')
-
     def import_xls(self, files):
         '''
         import xls file
@@ -174,8 +231,20 @@ class dbNH(object):
         #try:
         self.df = pd.read_excel(files)
         #except:
+
+    def import_csv(self, files):
+        '''
+        import csv file
+        '''
+        #import
+        #self.df = pd.read_csv(files, delimiter=";")
+        self.df = pd.read_csv(files, delimiter=";", encoding="ISO-8859-1")
+        #self.df = pd.read_csv(files, delimiter=";", encoding='latin1')
         
-        
+    def transform_floats(self):
+        self.df['Prime totale quittance'] = self.df['Prime totale quittance'].str.replace(',', '.').astype(float)
+        self.df['Montant Encaissé quittance'] = self.df['Montant Encaissé quittance'].str.replace(',', '.').astype(float)        
+
 
     def transform_dates(self):
         '''
@@ -184,7 +253,8 @@ class dbNH(object):
         df1 = self.df.copy()
         col_date = self.colsdate
         for d in col_date:
-            df1[d] = pd.to_datetime(df1[d], format='%d/%m/%Y', errors='coerce')
+            if d in self.colsCsv:
+                df1[d] = pd.to_datetime(df1[d], format='%d/%m/%Y', errors='coerce')
 
         self.df = df1.copy()
 
@@ -211,6 +281,12 @@ class dbNH(object):
             self.df.drop([0,1], inplace = True)
             self.df['dateExtraction'] = dt_orass
 
+    def transform_df_orass_csv(self):
+        '''
+        keep column name as in orass  orass excel
+        '''
+        self.df.columns = self.colsCsv
+        self.df['dateExtraction'] = self.dt_orassExtraction
 
      
     def setup_sql(self):
@@ -278,6 +354,10 @@ class dbNH(object):
         dfx.to_sql(table, self.sql_engine, if_exists='replace', index = False)
         #self.df = dfx.copy()
 
+    def export_to_sql_initTables_new2(self, dfx, table):
+    
+        dfx.to_sql(table, self.sql_engine, if_exists='replace', index = False)
+        
 
 
 
@@ -332,6 +412,43 @@ class dbNH(object):
         minutes, secondes = divmod(deltaT, 60)
         print('-Table created on {:02d}mn{:02d}sec'.format(int(minutes),int(secondes)))
 
+    def run_importCsvFile_nh(self, filename):
+            '''
+            Imports, transforms, and loads loan data into sql.
+            '''
+
+            t_start = time.perf_counter()
+
+            xfile = '01.database/data-excel/%s' % filename
+            print('file found: ',xfile, flush=True)
+            #try:
+            #with open(xfile) as f:
+            #    print(f)
+            self.import_csv(xfile)
+            print('- csv files converted to df', flush=True)
+            self.transform_df_orass_csv()
+            print(self.df.head(5), flush=True)
+            self.transform_dates()
+            self.transform_floats()
+            print('-df in a right format', flush=True)
+            print('-SQL DB to be created ...', flush=True)
+            self.setup_sql()
+            for k,v in self.nh_agences_init.items():
+                
+                dfx = self.df[self.df['Code intermédiaire']==k]
+                dfx['Libellé type intermédiaire']=v[2]
+                ##take sample of the dataframe
+                #dfx = dfx[dfx['Date effet quittance'].dt.date >= datetime.date(2021,1,1)]
+                self.export_to_sql_initTables_new2(dfx,v[0])
+                print(k, " in the db",  flush=True)
+            
+            
+            print('-Process all done',  flush=True)
+
+            t_end = time.perf_counter()
+            deltaT= t_end - t_start
+            minutes, secondes = divmod(deltaT, 60)
+            print('-Table created on {:02d}mn{:02d}sec'.format(int(minutes),int(secondes)),  flush=True)
 
     
 if __name__ == '__main__':
@@ -355,7 +472,7 @@ if __name__ == '__main__':
 
     
     parser = argparse.ArgumentParser()
-    parser.add_argument(dest='context' , choices=['test', 'nh'],help='context help')
+    parser.add_argument(dest='context' , choices=['test', 'nh', 'nhcsv'],help='context help')
     parser.add_argument('-f', '--file',dest='file' , type=str, help='file help')
     parser.add_argument('-d','--date',dest='dateExtract',type=lambda s: datetime.datetime.strptime(s, '%Y-%m-%d'),)
     parser.add_argument('-t','--table',dest='tableName',type=str)
@@ -371,6 +488,10 @@ if __name__ == '__main__':
         print("Besoin d'un argument TableName")
         exit()
 
+    if (args.context == 'nhcsv') & (args.dateExtract == None):
+        print("Besoin d'un argument DATE")
+        exit()
+
     else:
         db.dt_orassExtraction  = args.dateExtract
 
@@ -383,6 +504,10 @@ if __name__ == '__main__':
     ##import file orass
     if args.context == 'nh':
         db.run_importXlsFile_nh(args.file, args.tableName)
+    
+    if args.context == 'nhcsv':
+        db.run_importCsvFile_nh(args.file)
+
 
     elif args.context == 'test':
         db.query = "SELECT * FROM pg_catalog.pg_tables WHERE schemaname != 'pg_catalog' AND schemaname != 'information_schema';" 

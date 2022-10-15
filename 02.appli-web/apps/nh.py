@@ -47,10 +47,10 @@ from app import app
 # les objets
 from apps import nhObjet, nhData
 
-print()
+print(flush=True)
 today = datetime.date.today()
-print("Today's date on nh page: ", today)
-print()
+print("Today's date on nh page: ", today, flush=True)
+print(flush=True)
 
 #les agences
 #selection au moins 1 ac et 1 ag pour que l'appli fonctionne
@@ -122,20 +122,21 @@ for k,v in nh_agences_init.items():
     except:
         nh_agences[k][2]=pd.DataFrame()
     if nh_agences[k][2].empty:
-        print(nh_agences[k][1] +  " est vide")
+        print(nh_agences[k][1] +  " est vide", flush=True)
         del nh_agences[k]
-    reseauNbLine = reseauNbLine + len(nh_agences[k][2])
+    else: 
+        reseauNbLine = reseauNbLine + len(nh_agences[k][2])
 #Close the database connection
 dbConnection.close()
 
 
-print("nb total de lignes: " + str(reseauNbLine))
-print()
+print("nb total de lignes: " + str(reseauNbLine), flush=True)
+print(flush=True)
 #check Date effet quittance'
-print("les dates extraites : ")
+print("les dates extraites : ", flush=True)
 for k,v in nh_agences.items():
-   print(str(k) + " - " + v[2]['Date effet quittance'].min().strftime("%d %b %Y") + " >> " + v[2]['Date effet quittance'].max().strftime("%d %b %Y"))
-print()
+   print(str(k) + " - " + v[2]['Date effet quittance'].min().strftime("%d %b %Y") + " >> " + v[2]['Date effet quittance'].max().strftime("%d %b %Y"), flush=True)
+print(flush=True)
 
 #Check size
 #print(sys.getsizeof(nh_agences))
@@ -178,23 +179,23 @@ lsAgencesDropDown.update(nh_agences)
 # nettoyage de la base
 
 checking =  nhData.func_checking(nh_agences)
-print('data erreur: '+ str(checking ['erreur']))
-print()
+print('data erreur: '+ str(checking ['erreur']), flush=True)
+print(flush=True)
 nh_agences = nhData.func_reguler(checking['df'],nh_agences)
 
 checking =  nhData.func_checking(nh_agences)
-print('data erreur après correction: '+ str(checking ['erreur']))
-print()
+print('data erreur après correction: '+ str(checking ['erreur']), flush=True)
+print(flush=True)
 
 nh_agences = nhData.change_type(nh_agences)
-print('changement types: OK')
-print()
+print('changement types: OK', flush=True)
+print(flush=True)
 
 #check the shape for each df'
-print("les dimenssions des df: ")
+print("les dimenssions des df: ", flush=True)
 for k,v in nh_agences.items():
-    print(str(k) + " - " +str(v[2].shape))
-print()
+    print(str(k) + " - " +str(v[2].shape), flush=True)
+print(flush=True)
 
 
 # Les objets et les collections
@@ -202,16 +203,16 @@ print()
 ## appel des instances
 
 t_start = time.perf_counter()
-print("Début chargement .... ")
-print()
+print("Début chargement des objets.... ", flush=True)
+print(flush=True)
 #print(t_start)
 instAgences = nhObjet.Agences(nh_agences)
 instAgences.initCollection()
 t_end = time.perf_counter()
 deltaT= t_end - t_start
 minutes, secondes = divmod(deltaT, 60)
-print('-Table created on {:02d}mn{:02d}sec'.format(int(minutes),int(secondes)))
-print()
+print('-Table created on {:02d}mn{:02d}sec'.format(int(minutes),int(secondes)), flush=True)
+print(flush=True)
 #les elements du reseau
 dateExtractionReseau = instAgences.collectionAgences[next(iter(instAgences.collectionAgences))].dateExtraction
 year_n = dateExtractionReseau.year
@@ -221,12 +222,12 @@ year_n_1 = dateExtractionReseau.year - 1
 dateExtractionReseau = dateExtractionReseau.strftime("%d %b %Y")
 
 
-print()
-print("nb agences: "+ str(len(instAgences.collectionAgences)))
-print("Date d'extraction: ")
-print(dateExtractionReseau)
-print("nb de lignes: " + str(reseauNbLine))
-print()
+print(flush=True)
+print("nb agences: "+ str(len(instAgences.collectionAgences)), flush=True)
+print("Date d'extraction: ", flush=True)
+print(dateExtractionReseau, flush=True)
+print("nb de lignes: " + str(reseauNbLine), flush=True)
+print( flush=True)
 
 #print(instAgences.vueQuittancesEvolAnnuel[101])
 
